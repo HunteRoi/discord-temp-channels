@@ -1,7 +1,7 @@
 {
-  "name": "discord-temp-channels",
-  "version": "1.0.5",
-  "description": "Simple framework to facilitate the creation of a temporary voice channels system using Discord.js",
+  "name": "@hunteroi/discord-temp-channels",
+  "version": "1.0.0",
+  "description": "Based on Androz2091's package, this is a simple framework to facilitate the creation of a temporary voice & text channels system using Discord.js",
   "main": "lib/index.js",
   "files": [
     "lib/**/*"
@@ -14,14 +14,14 @@
     "prepublish": "npm run build"
   },
   "repository": "git+https://github.com/Androz2091/discord-temp-channels.git",
-  "author": "Androz2091 <androz2091@gmail.com>",
+  "author": "HunteRoi",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^12.0.2"
+    "discord.js": "^12.5.1"
   },
   "devDependencies": {
-    "@types/node": "^14.0.1",
-    "@types/ws": "^7.2.2",
+    "@types/node": "^14.14.16",
+    "@types/ws": "^7.4.0",
     "tslint": "^6.1.0",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.1.3"

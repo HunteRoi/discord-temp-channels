@@ -5,7 +5,7 @@ Discord Temp Channels is a framework to facilitate the creation of a temporary v
 ## Installation
 
 ```sh
-npm install --save discord-temp-channels
+npm install --save @hunteroi/discord-temp-channels
 ```
 
 ## Example
@@ -16,7 +16,7 @@ npm install --save discord-temp-channels
 const Discord = require("discord.js");
 const client = new Discord.Client();
 
-const TempChannels = require("discord-temp-channels");
+const TempChannels = require("@hunteroi/discord-temp-channels");
 const tempChannels = new TempChannels(client);
 
 // Register a new main channel
@@ -76,20 +76,20 @@ tempChannels.unregisterChannel("channel-id");
 
 ```js
 // Emitted when a child channel is created
-tempChannels.on("childCreate", (member, channel, parentChannel) => {
+tempChannels.on("childCreate", (member, channelData, parentChannel) => {
     console.log(member); // The member who created the new channel
-    console.log(channel); // The channel which was created
+    console.log(channelData); // The channelData which was created
     console.log(parentChannel); // The channel the member joined to create the new channel
 });
 
 // Emitted when a child channel is deleted
-tempChannels.on("childDelete", (member, channel, parentChannel) => {
+tempChannels.on("childDelete", (member, channelData, parentChannel) => {
     console.log(member); // The member who caused the deletion of the channel
-    console.log(channel); // The channel which was deleted
+    console.log(channelData); // The channelData which was deleted
     console.log(parentChannel); // The channel the member joined to create the deleted channel
 });
 
-// Emitted when a channels is registered
+// Emitted when a channel is registered
 tempChannels.on("channelRegister", (channelData) => {
     console.log(channelData);
     /*
@@ -104,7 +104,7 @@ tempChannels.on("channelRegister", (channelData) => {
     */
 });
 
-// Emitted when a channels is unregistered
+// Emitted when a channel is unregistered
 tempChannels.on("channelUnregister", (channelData) => {
     console.log(channelData);
     /*

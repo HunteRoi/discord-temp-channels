@@ -1,4 +1,6 @@
-import { GuildMember, Snowflake } from "discord.js";
+import { GuildMember, PermissionOverwriteOption, RoleResolvable, Snowflake, UserResolvable } from "discord.js";
+
+type Resolvables = RoleResolvable | UserResolvable;
 
 export interface ParentChannelOptions {
     childAutoDelete: boolean;
@@ -7,4 +9,6 @@ export interface ParentChannelOptions {
     childMaxUsers?: number;
     childBitrate?: number;
     childCategory?: Snowflake;
+    childPermissionOverwriteOption?: PermissionOverwriteOption;
+    childOverwriteRolesAndUsers?: Resolvables[];
 }
