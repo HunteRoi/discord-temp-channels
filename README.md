@@ -1,6 +1,14 @@
 # Discord Temporary Voice Channels
 
-Discord Temp Channels is a framework to facilitate the creation of a temporary voice channels system using Discord.js!
+This framework works the same way its parent does (see [discord-temp-channels](https://github.com/Androz2091/discord-temp-channels) of [Androz2091](https://github.com/Androz2091)) except that it brings a few new features: 
+- create a temporary text channel via a textual command
+- delete a temporary text channel via a textual command
+- more events like `voiceChannelCreate`, `textChannelCreate` and **2 more**
+- give the temporary channels' owner the `MANAGE_CHANNELS` permission on them
+- give more permissions to users/roles when channels are created (via registered parent options)
+- auto-prefix renamed temporary channels if the prefix is missing
+- reload temporary channels in memory in case the bot restarts while the feature is being used
+- Source code embedded documentation with [JSDoc](https://en.wikipedia.org/wiki/JSDoc)
 
 ## Installation
 
@@ -10,164 +18,47 @@ npm install --save @hunteroi/discord-temp-channels
 
 ## Example
 
-### Code
-
 ```js
-const Discord = require("discord.js");
+const Discord = require('discord.js');
 const client = new Discord.Client();
 
-const TempChannels = require("@hunteroi/discord-temp-channels");
-const tempChannels = new TempChannels(client);
+const TempChannelsManager = require('@hunteroi/discord-temp-channels');
+const manager = new TempChannelsManager(client, "textchannel");
 
 // Register a new main channel
-tempChannels.registerChannel("channel-id", {
-    childCategory: "category-id",
-    childAutoDeleteIfEmpty: true,
-    childMaxUsers: 3,
-    childFormat: (member, count) => `#${count} | ${member.user.username}'s lounge`
+manager.registerChannel('688084899537616999', {
+  childCategory: '569985103175090216',
+  childAutoDelete: true,
+  childFormat: (username, count) => `[DRoom #${count}] ${username}`,
+  childFormatRegex: /^\[DRoom #\d+\]\s+.+/i  
 });
 
-client.login("YOUR_TOKEN");
+client.login(); // discord.js will automatically load your token from process.env.DISCORD_TOKEN if set
 ```
 
-### Result
-
-![temp](./assets/temp-channels.gif)
-
-## Methods
-
-### Register Channel
-
-You have to register a channel to indicate to the package which channel will be used to create child channels.
-
+## Events
 ```js
-// Register a new parent channel
-tempChannels.registerChannel("channel-id", {
-    childCategory: "category-id",
-    childAutoDeleteIfEmpty: true,
-    childAutoDeleteIfOwnerLeaves: true,
-    childMaxUsers: 3,
-    childBitrate: 64000,
-    childFormat: (member, count) => `#${count} | ${member.user.username}'s lounge`
-});
+manager.on("voiceChannelCreate", (voiceChannel) => {});
+
+manager.on("voiceChannelDelete", (voiceChannel) => {});
+
+manager.on("textChannelCreate", (textChannel) => {});
+
+manager.on("textChannelDelete", (textChannel) => {});
+
+manager.on("childPrefix", (channel) => {});
+
+manager.on("childCreate", (member, child, parent) => {});
+
+manager.on("childDelete", (member, child, parent) => {});
+
+manager.on("channelRegister", (parent) => {});
+
+manager.on("channelUnregister", (parent) => {});
+
+manager.on("error", (error, message) => {});
 ```
 
-**channelID**: The ID of the channel the users will have to join to create a new channel.
-
-**options.childCategory**: Optional - This will be the category ID in which the new channels will be created.  
-**options.childAutoDelete**: Whether, when a channel is empty, it should be deleted.  
-**options.childAutoDeleteIfOwnerLeaves**: Whether, when the member who created a channel left it, it should be deleted (even if it's not empty).  
-**options.childMaxUsers**: Optional - This will be the maximum number of users that can join a channel  
-**options.childBitrate**: Optional - This will be the new channel bitrate  
-**options.childFormat**: This is a function which takes two parameters: the member (the one who created the channel, and the number of voice channels created from the same parent channel)  
-
-### Un-Register Channel
-
-You can un-register a channel, so the users who join the it won't create a new channel.
-
-```js
-// Unregister a parent channel
-tempChannels.unregisterChannel("channel-id");
-```
-
-**channelID**: The ID of the channel you want unregister.
-
-### Events
-
-```js
-// Emitted when a child channel is created
-tempChannels.on("childCreate", (member, channelData, parentChannel) => {
-    console.log(member); // The member who created the new channel
-    console.log(channelData); // The channelData which was created
-    console.log(parentChannel); // The channel the member joined to create the new channel
-});
-
-// Emitted when a child channel is deleted
-tempChannels.on("childDelete", (member, channelData, parentChannel) => {
-    console.log(member); // The member who caused the deletion of the channel
-    console.log(channelData); // The channelData which was deleted
-    console.log(parentChannel); // The channel the member joined to create the deleted channel
-});
-
-// Emitted when a channel is registered
-tempChannels.on("channelRegister", (channelData) => {
-    console.log(channelData);
-    /*
-    {
-        "channelID": "03909309383083"
-        "options": {
-            "childCategory": "380398303838398390",
-            "childAutoDeleteIfEmpty": true
-            etc...
-        }
-    }
-    */
-});
-
-// Emitted when a channel is unregistered
-tempChannels.on("channelUnregister", (channelData) => {
-    console.log(channelData);
-    /*
-    {
-        "channelID": "03909309383083"
-        "options": {
-            "childCategory": "380398303838398390",
-            "childAutoDeleteIfEmpty": true
-            etc...
-        }
-    }
-    */
-});
-
-// Emitted when there is an error
-tempChannels.on("error", (err, message) => {
-    console.log(err);
-    console.log(message);
-});
-```
-
-## Bot Example
-
-This code stores temporary channels data in a database (quick.db in this case). When the bot starts, it registers all the channels in the database and there is a command to add new main channels (!set).
-
-```js
-const Discord = require("discord.js");
-const client = new Discord.Client();
-
-const TempChannels = require("discord-temp-channels");
-const tempChannels = new TempChannels(client);
-
-const db = require("quick.db");
-
-client.on("ready", () => {
-    if (!db.get("temp-channels")) db.set("temp-channels", []);
-    db.get("temp-channels").forEach((channelData) => {
-        tempChannels.registerChannel(channelData.channelID, channelData.options);
-    });
-});
-
-client.on("message", (message) => {
-
-    if(message.content.startsWith("!set")){
-        if(tempChannels.channels.some((channel) => channel.channelID === message.member.voice.channel.id)){
-            return message.channel.send("Your voice channel is already a main voice channel");
-        }
-        const options = {
-            childAutoDelete: true,
-            childAutoDeleteIfOwnerLeaves: true,
-            childMaxUsers: 3,
-            childBitrate: 64000,
-            childFormat: (member, count) => `#${count} | ${member.user.username}'s lounge`
-        };
-        tempChannels.registerChannel(message.member.voice.channel.id, options);
-        db.push("temp-channels", {
-            channelID: message.member.voice.channel.id,
-            options: options
-        });
-        message.channel.send("Your voice is now a main voice channel!");
-    }
-
-});
-
-client.login("YOUR_TOKEN");
-```
+## Can be improved (PR accepted)
+- Creation & deletion of text channel through textual command (`./src/handlers/message`)
+- Auto detection of temporary channels in case of restart (`./src/handlers/ready`)

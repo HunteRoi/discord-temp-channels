@@ -1,3 +1,3 @@
-export * from "./ChildChannelData";
-export * from "./ParentChannelData";
-export * from "./ParentChannelOptions";
+export * from './ChildChannelData';
+export * from './ParentChannelData';
+export * from './ParentChannelOptions';

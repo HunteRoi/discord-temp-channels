@@ -1,7 +1,7 @@
-import { GuildMember, TextChannel, VoiceChannel } from "discord.js";
+import { GuildMember, TextChannel, VoiceChannel } from 'discord.js';
 
 export interface ChildChannelData {
-    owner: GuildMember;
-    voiceChannel: VoiceChannel;
-    textChannel?: TextChannel;
+  owner: GuildMember;
+  voiceChannel: VoiceChannel;
+  textChannel?: TextChannel;
 }

@@ -1,8 +1,8 @@
-import { Snowflake } from "discord.js";
-import { ChildChannelData, ParentChannelOptions } from "./";
+import { Snowflake } from 'discord.js';
+import { ChildChannelData, ParentChannelOptions } from './';
 
 export interface ParentChannelData {
-    channelID: Snowflake;
-    options: ParentChannelOptions;
-    children: ChildChannelData[];
+  channelID: Snowflake;
+  options: ParentChannelOptions;
+  children: ChildChannelData[];
 }
