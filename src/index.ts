@@ -124,7 +124,7 @@ export class ClientWithTempManager extends Client {
   }
 }
 
-**
+/**
  * Emitted when a new ticket is created by a user.
  * @event MailboxManager#ticketCreate
  * @param {Ticket} ticket The ticket
