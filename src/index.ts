@@ -123,3 +123,98 @@ export class ClientWithTempManager extends Client {
     this.tempChannelsManager = new TempChannelsManager(this);
   }
 }
+
+**
+ * Emitted when a new ticket is created by a user.
+ * @event MailboxManager#ticketCreate
+ * @param {Ticket} ticket The ticket
+ * @example
+ * manager.on('ticketCreate', (ticket) => {
+ *  console.log(`${ticket.id} has been created`);
+ * });
+ */
+
+/**
+ * Emitted when a voice channel is created.
+ * @event TempChannelsManager#voiceChannelCreate
+ * @param {Discord.VoiceChannel} voiceChannel The voice channel
+ * @example
+ * manager.on('voiceChannelCreate', (voiceChannel) => {});
+ */
+
+/**
+ * Emitted when a voice channel is deleted.
+ * @event TempChannelsManager#voiceChannelDelete
+ * @param {Discord.VoiceChannel} voiceChannel The voice channel
+ * @example
+ * manager.on('voiceChannelDelete', (voiceChannel) => {});
+ */
+
+/**
+ * Emitted when a text channel is created.
+ * @event TempChannelsManager#textChannelCreate
+ * @param {Discord.TextChannel} textChannel The text channel
+ * @example
+ * manager.on('textChannelCreate', (textChannel) => {});
+ */
+
+/**
+ * Emitted when a text channel is deleted.
+ * @event TempChannelsManager#textChannelDelete
+ * @param {Discord.TextChannel} textChannel The text channel
+ * @example
+ * manager.on('textChannelDelete', (textChannel) => {});
+ */
+
+/**
+ * Emitted when a channel is renamed and that the prefix is missing.
+ * @event TempChannelsManager#childPrefixChange
+ * @param {Discord.GuildChannel} channel The channel
+ * @example
+ * manager.on('childPrefixChange', (channel) => {});
+ */
+
+/**
+ * Emitted when a child channel is created.
+ * @event TempChannelsManager#childCreate
+ * @param {Discord.GuildMember | Discord.ClientUser} member The member
+ * @param {ChildChannelData} child The child channel data
+ * @param {ParentChannelData} parent The parent channel data
+ * @example
+ * manager.on('childCreate', (member, child, parent) => {});
+ */
+
+/**
+ * Emitted when a child channel is deleted.
+ * @event TempChannelsManager#childDelete
+ * @param {Discord.GuildMember | Discord.ClientUser} member The member
+ * @param {ChildChannelData} child The child channel data
+ * @param {ParentChannelData} parent The parent channel data
+ * @example
+ * manager.on('childDelete', (member, child, parent) => {});
+ */
+
+/**
+ * Emitted when a parent channel is registered.
+ * @event TempChannelsManager#channelRegister
+ * @param {ParentChannelData} parent The parent channel data
+ * @example
+ * manager.on('channelRegister', (parent) => {});
+ */
+
+/**
+ * Emitted when a parent channel is unregistered.
+ * @event TempChannelsManager#channelUnregister
+ * @param {ParentChannelData} parent The parent channel data
+ * @example
+ * manager.on('channelUnregister', (parent) => {});
+ */
+
+/**
+ * Emitted when an error occurs.
+ * @event TempChannelsManager#error
+ * @param {Error} error The error object
+ * @param {string} message The message of the error
+ * @example
+ * manager.on('error', (error, message) => {});
+ */
