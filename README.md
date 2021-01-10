@@ -29,7 +29,7 @@ manager.on('textChannelCreate', (textChannel: TextChannel) => {});
 
 manager.on('textChannelDelete', (textChannel: TextChannel) => {});
 
-manager.on('childPrefix', (channel: GuildChannel) => {});
+manager.on('childPrefixChange', (channel: GuildChannel) => {});
 
 manager.on('childCreate', (member: GuildMember | ClientUser, child: ChildChannelData, parent: ParentChannelData) => {});
 
