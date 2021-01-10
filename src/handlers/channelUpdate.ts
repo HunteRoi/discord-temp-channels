@@ -23,6 +23,6 @@ export const handleChannelUpdate = async (manager: TempChannelsManager, oldState
       : parent.options.childTextFormat(newState.name, count);
     newState.setName(name);
     
-    manager.emit('childPrefix', newState);
+    manager.emit('childPrefixChange', newState);
   }
 };
