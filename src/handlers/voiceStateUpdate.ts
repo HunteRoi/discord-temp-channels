@@ -1,66 +1,135 @@
-import { VoiceState } from 'discord.js';
-import { TempChannelsManager } from '..';
+import {
+	OverwriteType,
+	VoiceState,
+	Permissions,
+	VoiceChannel,
+	Constants,
+} from 'discord.js';
+import { TempChannelsManager } from '../TempChannelsManager';
+import { TempChannelsManagerEvents } from '../TempChannelsManagerEvents';
+import { ChildChannelData } from '../types';
 
-export const handleVoiceStateUpdate = async (manager: TempChannelsManager, oldState: VoiceState, newState: VoiceState) => {
-  const voiceChannelLeft = !!oldState.channelID && !newState.channelID;
-  const voiceChannelMoved = !!oldState.channelID && !!newState.channelID && oldState.channelID !== newState.channelID;
-  const voiceChannelJoined = !oldState.channelID && !!newState.channelID;
+export const handleVoiceStateUpdate = async (
+	manager: TempChannelsManager,
+	oldState: VoiceState,
+	newState: VoiceState
+) => {
+	if (!manager) return;
 
-  if (voiceChannelLeft || voiceChannelMoved) {
-    const parent = manager.channels.find(p => p.children.some(c => c.voiceChannel.id === oldState.channelID));
-    if (!parent) return;
+	const voiceChannelLeft = !!oldState.channelId && !newState.channelId;
+	const voiceChannelMoved =
+		!!oldState.channelId &&
+		!!newState.channelId &&
+		oldState.channelId !== newState.channelId;
+	const voiceChannelJoined = !oldState.channelId && !!newState.channelId;
 
-    const child = parent.children.find(c => c.voiceChannel.id === oldState.channelID);
-    if (!child) return;
+	if (voiceChannelLeft || voiceChannelMoved) {
+		const parent = manager.channels.find((p) =>
+			p.children.some((c) => c.voiceChannel.id === oldState.channelId)
+		);
+		if (!parent) return;
 
+		const child = parent.children.find(
+			(c) => c.voiceChannel.id === oldState.channelId
+		);
+		if (!child) return;
 
-    const childShouldBeDeleted =  (parent.options.childAutoDelete && oldState.channel.members.size === 0) ||
-                                  (parent.options.childAutoDeleteIfOwnerLeaves && !oldState.channel.members.has(child.owner.id));
-    if (childShouldBeDeleted) {
-      try {
-        if (child.textChannel) {
-          await child.textChannel.delete();
-          manager.emit('textChannelDelete', child.textChannel);
-        }
+		const childShouldBeDeleted =
+			(parent.options.childAutoDeleteIfEmpty &&
+				oldState.channel.members.size === 0) ||
+			(parent.options.childAutoDeleteIfOwnerLeaves &&
+				!oldState.channel.members.has(child.owner.id));
+		if (childShouldBeDeleted) {
+			try {
+				if (child.textChannel) {
+					await child.textChannel.delete();
+					manager.emit(
+						TempChannelsManagerEvents.textChannelDelete,
+						child.textChannel
+					);
+				}
 
-        await child.voiceChannel.delete();
-        manager.emit('voiceChannelDelete', child.voiceChannel);
+				await child.voiceChannel.delete();
+				manager.emit(
+					TempChannelsManagerEvents.voiceChannelDelete,
+					child.voiceChannel
+				);
 
-        parent.children = parent.children.filter(c => c.voiceChannel.id !== child.voiceChannel.id);
-        manager.emit('childDelete', newState.member, child, manager.client.channels.cache.get(parent.channelID));
-      } catch (err) {
-        manager.emit('error', err, 'Cannot auto delete channel ' + child.voiceChannel.id);
-      }
-    }
-  }
+				parent.children = parent.children.filter(
+					(c) => c.voiceChannel.id !== child.voiceChannel.id
+				);
+				manager.emit(
+					TempChannelsManagerEvents.childDelete,
+					newState.member,
+					child,
+					manager.client.channels.cache.get(parent.channelId)
+				);
+			} catch (err) {
+				manager.emit(
+					TempChannelsManagerEvents.error,
+					err,
+					'Cannot auto delete channel ' + child.voiceChannel.id
+				);
+			}
+		}
+	}
 
-  if (voiceChannelJoined || voiceChannelMoved) {
-    const parent = manager.channels.find(p => p.channelID === newState.channelID);
-    if (!parent) return;
+	if (voiceChannelJoined || voiceChannelMoved) {
+		const parent = manager.channels.find(
+			(p) => p.channelId === newState.channelId
+		);
+		if (!parent) return;
 
-    const count = parent.children.length + 1;
-    const newChannelName = parent.options.childVoiceFormat(newState.member.displayName, count);
-    const voiceChannel = await newState.guild.channels.create(newChannelName, {
-      parent: parent.options.childCategory,
-      bitrate: parent.options.childBitrate,
-      userLimit: parent.options.childMaxUsers,
-      type: 'voice',
-      permissionOverwrites: [{ id: newState.member.id, type: 'member', allow: 'MANAGE_CHANNELS' }]
-    });
-    manager.emit('voiceChannelCreate', voiceChannel);
+		const count = parent.children.length + 1;
+		const newChannelName = parent.options.childVoiceFormat(
+			newState.member.displayName,
+			count
+		);
+		const voiceChannel = (await newState.guild.channels.create(newChannelName, {
+			parent: parent.options.childCategory,
+			bitrate: parent.options.childBitrate,
+			userLimit: parent.options.childMaxUsers,
+			type: Constants.ChannelTypes.GUILD_VOICE,
+			permissionOverwrites: [
+				{
+					id: newState.member.id,
+					type: Constants.OverwriteTypes[
+						Constants.OverwriteTypes.member
+					] as OverwriteType,
+					allow: Permissions.FLAGS.MANAGE_CHANNELS,
+				},
+			],
+		})) as VoiceChannel;
+		manager.emit(TempChannelsManagerEvents.voiceChannelCreate, voiceChannel);
 
-    if (parent.options.childPermissionOverwriteOption) {
-      for (const roleOrUser of parent.options.childOverwriteRolesAndUsers) {
-        voiceChannel
-          .updateOverwrite(roleOrUser, parent.options.childPermissionOverwriteOption)
-          .catch((err) => manager.emit('error', err, `Couldn't update the permissions of the channel ${voiceChannel.id} for role or user ${roleOrUser.toString()}`));
-      }
-    }
+		if (parent.options.childPermissionOverwriteOptions) {
+			for (const roleOrUser of parent.options.childOverwriteRolesAndUsers) {
+				voiceChannel.permissionOverwrites
+					.edit(roleOrUser, parent.options.childPermissionOverwriteOptions)
+					.catch((err) =>
+						manager.emit(
+							TempChannelsManagerEvents.error,
+							err,
+							`Couldn't update the permissions of the channel ${
+								voiceChannel.id
+							} for role or user ${roleOrUser.toString()}`
+						)
+					);
+			}
+		}
 
-    const child = { owner: newState.member, voiceChannel };
-    parent.children.push(child);
-    manager.emit('childCreate', newState.member, child, manager.client.channels.cache.get(parent.channelID));
+		const child: ChildChannelData = {
+			owner: newState.member,
+			voiceChannel,
+		};
+		parent.children.push(child);
+		manager.emit(
+			TempChannelsManagerEvents.childCreate,
+			newState.member,
+			child,
+			manager.client.channels.cache.get(parent.channelId)
+		);
 
-    newState.setChannel(voiceChannel);
-  }
+		newState.setChannel(voiceChannel.id);
+	}
 };

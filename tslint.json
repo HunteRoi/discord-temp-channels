@@ -4,7 +4,5 @@
     "jsRules": {
       "no-unused-expression": true
     },
-    "rules": {
-    },
     "rulesDirectory": []
 }
