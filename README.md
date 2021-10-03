@@ -28,7 +28,7 @@ npm install --save @hunteroi/discord-temp-channels
 
 ## Examples
 
-See [./example/index.js](example/index.js) and [./example/index2.js](example/index2.js).
+See [./example/withTempChannelsManager.js](example/withTempChannelsManager.js) and [./example/withClientWithTempManager.js](example/withClientWithTempManager.js).
 
 <br />
 

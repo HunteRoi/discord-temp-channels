@@ -23,8 +23,8 @@
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\" --tab-width 4",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
-    "example": "npm run build & node ./example/index.js",
-    "example2": "npm run build & node ./example/index2.js"
+    "example": "npm run build & node ./example/withTempChannelsManager.js",
+    "example2": "npm run build & node ./example/withClientWithTempManager.js"
   },
   "dependencies": {
     "@discordjs/builders": "^0.6.0",
