@@ -4,7 +4,7 @@ const synchronizeSlashCommands = require('discord-sync-commands');
 const { ClientWithTempManager, TempChannelsManagerEvents } = require('../lib');
 
 const client = new ClientWithTempManager({
-	intents: [Intents.FLAGS.GUILD_VOICE_STATES],
+	intents: [Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILDS],
 });
 synchronizeSlashCommands(
 	client,

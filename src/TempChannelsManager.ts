@@ -4,6 +4,10 @@ import {
 	GuildChannel,
 	Collection,
 	Intents,
+	DMChannel,
+	VoiceState,
+	Interaction,
+	Message,
 } from 'discord.js';
 import { EventEmitter } from 'events';
 
@@ -53,28 +57,42 @@ export class TempChannelsManager extends EventEmitter {
 			);
 		}
 
+		if (!intents.has(Intents.FLAGS.GUILDS)) {
+			throw new Error('GUILDS intent is required to use this package!');
+		}
+
 		this.channels = new Collection();
 		this.client = client;
 
-		this.client.on('voiceStateUpdate', async (oldState, newState) =>
+		this.client.on(
+			'voiceStateUpdate',
+			async (oldState: VoiceState, newState: VoiceState) =>
 			handleVoiceStateUpdate(this, oldState, newState)
 		);
-		this.client.on('channelUpdate', async (oldState, newState) =>
+		this.client.on(
+			'channelUpdate',
+			async (
+				oldState: GuildChannel | DMChannel,
+				newState: GuildChannel | DMChannel
+			) =>
 			handleChannelUpdate(
 				this,
 				oldState as GuildChannel,
 				newState as GuildChannel
 			)
 		);
-		this.client.on('channelDelete', async (channel) =>
+		this.client.on('channelDelete', async (channel: GuildChannel | DMChannel) =>
 			handleChannelDelete(this, channel as GuildChannel)
 		);
 
-		this.on(TempChannelsManagerEvents.channelRegister, async (parent) =>
-			handleRegistering(this, parent)
+		this.on(
+			TempChannelsManagerEvents.channelRegister,
+			async (parent: ParentChannelData) => handleRegistering(this, parent)
 		);
-		this.on(TempChannelsManagerEvents.createText, async (message) =>
-			handleTextCreation(this, message)
+		this.on(
+			TempChannelsManagerEvents.createText,
+			async (interactionOrMessage: Interaction | Message) =>
+				handleTextCreation(this, interactionOrMessage)
 		);
 	}
 
@@ -84,7 +102,7 @@ export class TempChannelsManager extends EventEmitter {
 	 * @param {Snowflake} channelId
 	 * @param {ParentChannelOptions} [options={
 	 *       childCategory: null,
-	 *       childAutoDelete: true,
+	 *       childAutoDeleteIfEmpty: true,
 	 *       childAutoDeleteIfOwnerLeaves: false,
 	 *       childFormat: (name, count) => `[DRoom #${count}] ${name}`,
 	 *       childFormatRegex: /^\[DRoom #\d+\]\s+.+/i,

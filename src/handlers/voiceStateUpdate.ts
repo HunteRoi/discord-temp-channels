@@ -80,10 +80,15 @@ export const handleVoiceStateUpdate = async (
 		);
 		if (!parent) return;
 
-		const count = parent.children.length + 1;
+		const count = Math.max(
+			0,
+			...parent.children.map((c) =>
+				Number(c.voiceChannel.name.match(/\d+/g)?.shift())
+			)
+		);
 		const newChannelName = parent.options.childVoiceFormat(
 			newState.member.displayName,
-			count
+			count + 1
 		);
 		const voiceChannel = (await newState.guild.channels.create(newChannelName, {
 			parent: parent.options.childCategory,

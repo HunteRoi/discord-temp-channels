@@ -1,4 +1,3 @@
-import { OverwriteType } from 'discord-api-types';
 import {
 	Collection,
 	VoiceChannel,
@@ -39,7 +38,9 @@ export const handleRegistering = async (
 					parent.options.childTextFormatRegex.test(c.name) &&
 					c.isText() &&
 					c.permissionOverwrites.cache.some(
-						(po) => po.type === OverwriteType.Member.toString()
+						(po) =>
+							po.type ===
+							Constants.OverwriteTypes[Constants.OverwriteTypes.member]
 					)
 			) as Collection<Snowflake, TextChannel>;
 		}

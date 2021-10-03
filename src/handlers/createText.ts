@@ -15,6 +15,21 @@ export const handleTextCreation = async (
 	manager: TempChannelsManager,
 	interactionOrMessage: Interaction | Message
 ) => {
+	async function createTextChannel(channelName: string): Promise<TextChannel> {
+		return (await interactionOrMessage.guild.channels.create(channelName, {
+			parent: parent.options.childCategory,
+			type: Constants.ChannelTypes.GUILD_TEXT,
+			permissionOverwrites: [
+				{
+					id: owner.id,
+					type: Constants.OverwriteTypes[
+						Constants.OverwriteTypes.member
+					] as OverwriteType,
+					allow: Permissions.FLAGS.MANAGE_CHANNELS,
+				},
+			],
+		})) as TextChannel;
+	}
 	if (!manager || !interactionOrMessage) return;
 
 	const owner = interactionOrMessage.member as GuildMember;
@@ -39,7 +54,12 @@ export const handleTextCreation = async (
 	const child = parent.children.find(
 		(c) => c.voiceChannel.id === voiceChannel.id
 	);
-	if (!child || child.owner.id !== owner.id) return;
+	if (!child || child.owner.id !== owner.id) {
+		return manager.emit(
+			TempChannelsManagerEvents.voiceNotExisting,
+			interactionOrMessage
+		);
+	}
 
 	if (!child.textChannel) {
 		const count = parent.children.indexOf(child) + 1;
@@ -48,27 +68,11 @@ export const handleTextCreation = async (
 			count
 		);
 
-		const textChannel = (await interactionOrMessage.guild.channels.create(
-			newChannelName,
-			{
-				parent: parent.options.childCategory,
-				type: Constants.ChannelTypes.GUILD_TEXT,
-				permissionOverwrites: [
-					{
-						id: owner.id,
-						type: Constants.OverwriteTypes[
-							Constants.OverwriteTypes.member
-						] as OverwriteType,
-						allow: Permissions.FLAGS.MANAGE_CHANNELS,
-					},
-				],
-			}
-		)) as TextChannel;
-		child.textChannel = textChannel;
+		child.textChannel = await createTextChannel(newChannelName);
 
 		return manager.emit(
 			TempChannelsManagerEvents.textChannelCreate,
-			textChannel,
+			child.textChannel,
 			interactionOrMessage
 		);
 	} else {

@@ -4,7 +4,7 @@ const synchronizeSlashCommands = require('discord-sync-commands');
 const { TempChannelsManager, TempChannelsManagerEvents } = require('../lib');
 
 const client = new Client({
-	intents: [Intents.FLAGS.GUILD_VOICE_STATES],
+	intents: [Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILDS],
 });
 synchronizeSlashCommands(
 	client,
@@ -31,6 +31,8 @@ client.on('ready', () => {
 		childVoiceFormatRegex: /^Example #\d+ \|/,
 		childTextFormat: (str, count) => `example-${count}_${str}`,
 		childTextFormatRegex: /^example-\d+_/i,
+		textChannelAsThreadParent: '729422879371952300',
+		threadArchiveDuration: 60,
 	});
 });
 
