@@ -12,7 +12,7 @@ This library works the same way its parent does (see [discord-temp-channels](htt
 - reload temporary channels in memory in case the bot restarts while the feature is being used
 - Source code embedded documentation with [JSDoc](https://en.wikipedia.org/wiki/JSDoc)
 
-![IMAGE]()
+![IMAGE](./resources/example.gif)
 
 ## Prerequisites ⚠️
 
