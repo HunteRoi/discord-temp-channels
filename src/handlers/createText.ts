@@ -5,6 +5,7 @@ import {
 	Constants,
 	GuildMember,
 	Interaction,
+	Message,
 } from 'discord.js';
 
 import { TempChannelsManagerEvents } from '../TempChannelsManagerEvents';
@@ -12,11 +13,11 @@ import { TempChannelsManager } from '../TempChannelsManager';
 
 export const handleTextCreation = async (
 	manager: TempChannelsManager,
-	interaction: Interaction
+	interactionOrMessage: Interaction | Message
 ) => {
-	if (!manager || !interaction) return;
+	if (!manager || !interactionOrMessage) return;
 
-	const owner = interaction.member as GuildMember;
+	const owner = interactionOrMessage.member as GuildMember;
 	const voiceChannel = owner.voice.channel;
 	if (
 		!voiceChannel ||
@@ -26,7 +27,7 @@ export const handleTextCreation = async (
 	) {
 		return manager.emit(
 			TempChannelsManagerEvents.voiceNotExisting,
-			interaction
+			interactionOrMessage
 		);
 	}
 
@@ -47,7 +48,7 @@ export const handleTextCreation = async (
 			count
 		);
 
-		const textChannel = (await interaction.guild.channels.create(
+		const textChannel = (await interactionOrMessage.guild.channels.create(
 			newChannelName,
 			{
 				parent: parent.options.childCategory,
@@ -68,7 +69,7 @@ export const handleTextCreation = async (
 		return manager.emit(
 			TempChannelsManagerEvents.textChannelCreate,
 			textChannel,
-			interaction
+			interactionOrMessage
 		);
 	} else {
 		const textChannel = child.textChannel;
@@ -79,7 +80,7 @@ export const handleTextCreation = async (
 		return manager.emit(
 			TempChannelsManagerEvents.textChannelDelete,
 			textChannel,
-			interaction
+			interactionOrMessage
 		);
 	}
 };

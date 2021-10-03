@@ -167,12 +167,22 @@ export class TempChannelsManager extends EventEmitter {
  */
 
 /**
+ * Emitted when a text channel is created but the user is not an owner of a voice channel.
+ * @event TempChannelsManager#voiceNotExisting
+ * @see TempChannelsManagerEvents#voiceNotExisting
+ * @param {Discord.Interaction | Discord.Message} interactionOrMessage Either the interaction or the message that triggered the activity
+ * @example
+ * manager.on('voiceNotExisting', (interactionOrMessage) => {});
+ */
+
+/**
  * Emitted when a text channel is created.
  * @event TempChannelsManager#textChannelCreate
  * @see TempChannelsManagerEvents#textChannelCreate
  * @param {Discord.TextChannel} textChannel The text channel
+ * @param {Discord.Interaction | Discord.Message} interactionOrMessage Either the interaction or the message that triggered the activity
  * @example
- * manager.on('textChannelCreate', (textChannel) => {});
+ * manager.on('textChannelCreate', (textChannel, interactionOrMessage) => {});
  */
 
 /**
@@ -180,8 +190,9 @@ export class TempChannelsManager extends EventEmitter {
  * @event TempChannelsManager#textChannelDelete
  * @see TempChannelsManagerEvents#textChannelDelete
  * @param {Discord.TextChannel} textChannel The text channel
+ * @param {Discord.Interaction | Discord.Message} interactionOrMessage Either the interaction or the message that triggered the activity
  * @example
- * manager.on('textChannelDelete', (textChannel) => {});
+ * manager.on('textChannelDelete', (textChannel, interactionOrMessage) => {});
  */
 
 /**
