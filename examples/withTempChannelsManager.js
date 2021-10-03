@@ -23,7 +23,7 @@ const manager = new TempChannelsManager(client);
 client.on('ready', () => {
 	console.log('Connected!');
 
-	manager.registerChannel('CHANNEL_ID', {
+	manager.registerChannel('VOICE_CHANNEL_ID', {
 		childCategory: 'CATEGORY_ID',
 		childAutoDeleteIfEmpty: true,
 		childAutoDeleteIfOwnerLeaves: false,
@@ -31,7 +31,7 @@ client.on('ready', () => {
 		childVoiceFormatRegex: /^Example #\d+ \|/,
 		childTextFormat: (str, count) => `example-${count}_${str}`,
 		childTextFormatRegex: /^example-\d+_/i,
-		textChannelAsThreadParent: '729422879371952300',
+		textChannelAsThreadParent: 'TEXT_CHANNEL_ID',
 		threadArchiveDuration: 60,
 	});
 });

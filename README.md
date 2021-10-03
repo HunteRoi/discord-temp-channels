@@ -18,7 +18,12 @@ This library works the same way its parent does (see [discord-temp-channels](htt
 
 Starting at **v2.0.0**, you must use **NodeJS v16.6.0 or higher** to run a bot with this library.
 
-You also must not forget to include **mandatory intents** as well as give your bot the rights to **manage application commands**.
+You also must not forget to include [mandatory intents](#mandatory-intents) as well as give your bot the rights to [use application commands](https://discord.com/developers/docs/interactions/application-commands#authorizing-your-application).
+
+### Mandatory intents
+
+- GUILD_VOICE_STATE: used to detect guild members voice state updates (when someone joins a voice channel, leaves or changes from one to another, ...).
+- GUILDS: used to recover from possible crashes of your bot (detects and reconstructs the temporary channels list and deletes them if necessary).
 
 ## Installation
 
@@ -32,7 +37,7 @@ See [./example/withTempChannelsManager.js](example/withTempChannelsManager.js) a
 
 <br />
 
-⚠️ Please be aware that using slash commands in temporary text channels might raise exceptions in your event listeners. I highly suggest that you wrap your listeners' code in a try-catch block (or use the then/catch chaining methods of the `Promise` class in case you don't apply the async/await pattern).
+⚠️ Please be aware that using slash commands in temporary text channels might raise exceptions in your event listeners. We highly suggest that you wrap your listeners' code in a try-catch block (or use the then/catch chaining methods of the `Promise` class in case you don't apply the async/await pattern).
 
 For exemple, if you try to execute `interaction.editReply` after the interaction's channel has been deleted, you will receive an error in your console.
 
@@ -118,6 +123,8 @@ client.on('interactionCreate', async (interaction) => {
 	}
 });
 ```
+
+Even though we do not provide an example, this works the same way for the `messageCreate` event.
 
 ## Contribution
 

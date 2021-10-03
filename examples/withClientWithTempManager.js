@@ -21,7 +21,7 @@ synchronizeSlashCommands(
 client.on('ready', () => {
 	console.log('Connected!');
 
-	client.tempChannelsManager.registerChannel('CHANNEL_ID', {
+	client.tempChannelsManager.registerChannel('VOICE_CHANNEL_ID', {
 		childCategory: 'CATEGORY_ID',
 		childAutoDeleteIfEmpty: true,
 		childAutoDeleteIfOwnerLeaves: false,
@@ -29,6 +29,8 @@ client.on('ready', () => {
 		childVoiceFormatRegex: /^Example #\d+ \|/,
 		childTextFormat: (str, count) => `example-${count}_${str}`,
 		childTextFormatRegex: /^example-\d+_/i,
+		textChannelAsThreadParent: 'TEXT_CHANNEL_ID',
+		threadArchiveDuration: 60,
 	});
 });
 
