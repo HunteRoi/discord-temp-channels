@@ -9,7 +9,7 @@ const isVoiceOrTextChannel = (c: ChildChannelData, id: Snowflake) =>
 export const handleChannelDelete = async (
 	manager: TempChannelsManager,
 	channel: GuildChannel
-): Promise<void> => {
+) => {
 	if (!manager || !channel) return;
 
 	let parent = manager.channels.get(channel.id);

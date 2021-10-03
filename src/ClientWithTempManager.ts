@@ -2,7 +2,7 @@ import { Client, ClientOptions } from 'discord.js';
 import { TempChannelsManager } from './TempChannelsManager';
 
 /**
- * A wrapper of {@link Client} that provides a support for the TempChannelsManager.
+ * A wrapper of {@link Client} that provides a support for the {@link TempChannelsManager}.
  * @export
  * @class ClientWithTempManager
  * @extends {Client}
@@ -14,7 +14,7 @@ export class ClientWithTempManager extends Client {
 	 * @name ClientWithTempManager#tempChannelsManager
 	 * @type {TempChannelsManager}
 	 */
-	public tempChannelsManager: TempChannelsManager;
+	public readonly tempChannelsManager: TempChannelsManager;
 
 	/**
 	 * Creates an instance of ClientWithTempManager.

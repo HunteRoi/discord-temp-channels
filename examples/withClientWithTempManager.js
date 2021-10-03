@@ -23,7 +23,7 @@ client.on('ready', () => {
 
 	client.tempChannelsManager.registerChannel('CHANNEL_ID', {
 		childCategory: 'CATEGORY_ID',
-		childAutoDelete: true,
+		childAutoDeleteIfEmpty: true,
 		childAutoDeleteIfOwnerLeaves: false,
 		childVoiceFormat: (str, count) => `Example #${count} | ${str}`,
 		childVoiceFormatRegex: /^Example #\d+ \|/,
