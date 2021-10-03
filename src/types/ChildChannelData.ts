@@ -1,4 +1,9 @@
-import { GuildMember, TextChannel, VoiceChannel } from 'discord.js';
+import {
+	GuildMember,
+	TextChannel,
+	ThreadChannel,
+	VoiceChannel,
+} from 'discord.js';
 
 /**
  * The data about a temporary channel ticket
@@ -24,10 +29,10 @@ export interface ChildChannelData {
 	voiceChannel: VoiceChannel;
 
 	/**
-	 * The optional text channel
+	 * The optional text/thread channel
 	 *
-	 * @type {TextChannel}
+	 * @type {TextChannel | ThreadChannel}
 	 * @memberof ChildChannelData
 	 */
-	textChannel?: TextChannel;
+	textChannel?: TextChannel | ThreadChannel;
 }

@@ -6,6 +6,7 @@ import {
 	Intents,
 	DMChannel,
 	VoiceState,
+	ThreadChannel,
 	Interaction,
 	Message,
 } from 'discord.js';
@@ -67,7 +68,7 @@ export class TempChannelsManager extends EventEmitter {
 		this.client.on(
 			'voiceStateUpdate',
 			async (oldState: VoiceState, newState: VoiceState) =>
-			handleVoiceStateUpdate(this, oldState, newState)
+				handleVoiceStateUpdate(this, oldState, newState)
 		);
 		this.client.on(
 			'channelUpdate',
@@ -75,14 +76,22 @@ export class TempChannelsManager extends EventEmitter {
 				oldState: GuildChannel | DMChannel,
 				newState: GuildChannel | DMChannel
 			) =>
-			handleChannelUpdate(
-				this,
-				oldState as GuildChannel,
-				newState as GuildChannel
-			)
+				handleChannelUpdate(
+					this,
+					oldState as GuildChannel,
+					newState as GuildChannel
+				)
 		);
 		this.client.on('channelDelete', async (channel: GuildChannel | DMChannel) =>
 			handleChannelDelete(this, channel as GuildChannel)
+		);
+		this.client.on(
+			'threadUpdate',
+			async (oldState: ThreadChannel, newState: ThreadChannel) =>
+				handleChannelUpdate(this, oldState, newState)
+		);
+		this.client.on('threadDelete', async (channel: ThreadChannel) =>
+			handleChannelDelete(this, channel)
 		);
 
 		this.on(
@@ -197,7 +206,7 @@ export class TempChannelsManager extends EventEmitter {
  * Emitted when a text channel is created.
  * @event TempChannelsManager#textChannelCreate
  * @see TempChannelsManagerEvents#textChannelCreate
- * @param {Discord.TextChannel} textChannel The text channel
+ * @param {Discord.TextChannel | Discord.ThreadChannel} textChannel The text channel
  * @param {Discord.Interaction | Discord.Message} interactionOrMessage Either the interaction or the message that triggered the activity
  * @example
  * manager.on('textChannelCreate', (textChannel, interactionOrMessage) => {});
@@ -207,7 +216,7 @@ export class TempChannelsManager extends EventEmitter {
  * Emitted when a text channel is deleted.
  * @event TempChannelsManager#textChannelDelete
  * @see TempChannelsManagerEvents#textChannelDelete
- * @param {Discord.TextChannel} textChannel The text channel
+ * @param {Discord.TextChannel | Discord.ThreadChannel} textChannel The text channel
  * @param {Discord.Interaction | Discord.Message} interactionOrMessage Either the interaction or the message that triggered the activity
  * @example
  * manager.on('textChannelDelete', (textChannel, interactionOrMessage) => {});

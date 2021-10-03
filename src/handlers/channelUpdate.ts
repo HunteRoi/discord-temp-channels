@@ -1,11 +1,11 @@
-import { GuildChannel, Constants } from 'discord.js';
+import { GuildChannel, Constants, ThreadChannel } from 'discord.js';
 import { TempChannelsManagerEvents } from '../TempChannelsManagerEvents';
 import { TempChannelsManager } from '../TempChannelsManager';
 
 export const handleChannelUpdate = async (
 	manager: TempChannelsManager,
-	oldState: GuildChannel,
-	newState: GuildChannel
+	oldState: GuildChannel | ThreadChannel,
+	newState: GuildChannel | ThreadChannel
 ) => {
 	if (!manager || !oldState || !newState) return;
 

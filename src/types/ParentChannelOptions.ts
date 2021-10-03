@@ -2,6 +2,7 @@ import {
 	PermissionOverwriteOptions,
 	RoleResolvable,
 	Snowflake,
+	ThreadAutoArchiveDuration,
 	UserResolvable,
 } from 'discord.js';
 
@@ -87,6 +88,22 @@ export interface ParentChannelOptions {
 	 * @memberof ParentChannelOptions
 	 */
 	childTextFormatRegex: RegExp;
+
+	/**
+	 * The channel ID of a text channel if the temporary text channel should be a thread.
+	 *
+	 * @type {Snowflake}
+	 * @memberof ParentChannelOptions
+	 */
+	textChannelAsThreadParent?: Snowflake;
+
+	/**
+	 * The maximum duration before a thread becomes inactive thus archived.
+	 *
+	 * @type {ThreadAutoArchiveDuration}
+	 * @memberof ParentChannelOptions
+	 */
+	threadArchiveDuration?: ThreadAutoArchiveDuration;
 
 	/**
 	 * The maximum number of users in a child channel.

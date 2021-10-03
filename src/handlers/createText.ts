@@ -6,6 +6,9 @@ import {
 	GuildMember,
 	Interaction,
 	Message,
+	Snowflake,
+	ThreadChannel,
+	ThreadAutoArchiveDuration,
 } from 'discord.js';
 
 import { TempChannelsManagerEvents } from '../TempChannelsManagerEvents';
@@ -30,6 +33,27 @@ export const handleTextCreation = async (
 			],
 		})) as TextChannel;
 	}
+
+	async function createThreadChannel(
+		parentId: Snowflake,
+		channelName: string,
+		autoArchiveDuration: ThreadAutoArchiveDuration
+	): Promise<ThreadChannel> {
+		const parentChannel = (await interactionOrMessage.guild.channels.fetch(
+			parentId
+		)) as TextChannel;
+		if (!parentChannel) return;
+
+		const thread = await parentChannel.threads.create({
+			name: channelName,
+			autoArchiveDuration,
+		});
+
+		thread.members.add(interactionOrMessage.member.user.id);
+
+		return thread;
+	}
+
 	if (!manager || !interactionOrMessage) return;
 
 	const owner = interactionOrMessage.member as GuildMember;
@@ -68,7 +92,13 @@ export const handleTextCreation = async (
 			count
 		);
 
-		child.textChannel = await createTextChannel(newChannelName);
+		child.textChannel = parent.options.textChannelAsThreadParent
+			? await createThreadChannel(
+					parent.options.textChannelAsThreadParent,
+					newChannelName,
+					parent.options.threadArchiveDuration ?? 60
+			  )
+			: await createTextChannel(newChannelName);
 
 		return manager.emit(
 			TempChannelsManagerEvents.textChannelCreate,

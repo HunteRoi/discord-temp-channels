@@ -1,4 +1,9 @@
-import { GuildChannel, VoiceChannel, Snowflake } from 'discord.js';
+import {
+	GuildChannel,
+	VoiceChannel,
+	Snowflake,
+	ThreadChannel,
+} from 'discord.js';
 import { TempChannelsManager } from '../TempChannelsManager';
 import { TempChannelsManagerEvents } from '../TempChannelsManagerEvents';
 import { ChildChannelData, ParentChannelData } from '../types';
@@ -8,7 +13,7 @@ const isVoiceOrTextChannel = (c: ChildChannelData, id: Snowflake) =>
 
 export const handleChannelDelete = async (
 	manager: TempChannelsManager,
-	channel: GuildChannel
+	channel: GuildChannel | ThreadChannel
 ) => {
 	if (!manager || !channel) return;
 
