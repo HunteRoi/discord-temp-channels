@@ -5,8 +5,7 @@
 
 This library works the same way its parent does (see [discord-temp-channels](https://github.com/Androz2091/discord-temp-channels) of [Androz2091](https://github.com/Androz2091)) except that it brings a few new features:
 
-- create/delete a temporary text channel via an event
-- more events like `voiceChannelCreate`, `textChannelCreate` and **4 more**
+- more events like `voiceChannelCreate` and **4 more**
 - give the temporary channels' owner the `MANAGE_CHANNELS` permission on them
 - give more permissions to users/roles when channels are created (via registered parent options)
 - auto-prefix renamed temporary channels if the prefix is missing
@@ -36,12 +35,6 @@ npm install --save @hunteroi/discord-temp-channels
 
 See [./example/withTempChannelsManager.js](example/withTempChannelsManager.js) and [./example/withClientWithTempManager.js](example/withClientWithTempManager.js).
 
-<br />
-
-⚠️ Please be aware that using slash commands in temporary text channels might raise exceptions in your event listeners. We highly suggest that you wrap your listeners' code in a try-catch block (or use the then/catch chaining methods of the `Promise` class in case you don't apply the async/await pattern).
-
-For exemple, if you try to execute `interaction.editReply` after the interaction's channel has been deleted, you will receive an error in your console.
-
 ## Events
 
 ```ts
@@ -63,21 +56,6 @@ manager.on(
 manager.on(
   TempChannelsManagerEvents.voiceChannelDelete,
   (voiceChannel: VoiceChannel) => {}
-);
-
-manager.on(
-  TempChannelsManagerEvents.voiceNotExisting,
-  (interaction: Interaction) => {}
-);
-
-manager.on(
-  TempChannelsManagerEvents.textChannelCreate,
-  (textChannel: TextChannel, interaction: Interaction | undefined) => {}
-);
-
-manager.on(
-  TempChannelsManagerEvents.textChannelDelete,
-  (textChannel: TextChannel, interaction: Interaction | undefined) => {}
 );
 
 manager.on(
@@ -108,24 +86,6 @@ manager.on(
   (error: Error, message: string) => {}
 );
 ```
-
-## Commands
-
-In order to trigger the creation/deletion of a text channel, please emit the `TempChannelsManagerEvents.createText` event using your instance of the `TempChannelsManager` class and pass it the interaction object:
-
-```ts
-client.on('interactionCreate', async (interaction) => {
-  if (interaction.isCommand() && interaction.commandName === 'createtext') {
-    await interaction.deferReply();
-    client.tempChannelsManager.emit(
-      TempChannelsManagerEvents.createText,
-      interaction
-    );
-  }
-});
-```
-
-Even though we do not provide an example, this works the same way for the `messageCreate` event.
 
 ## Contribution
 

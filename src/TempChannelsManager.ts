@@ -6,24 +6,16 @@ import {
   DMChannel,
   VoiceState,
   ThreadChannel,
-  Interaction,
-  Message,
   IntentsBitField,
   VoiceChannel,
-  TextChannel,
   ChannelType,
   OverwriteType,
-  PermissionsBitField,
-  ThreadAutoArchiveDuration,
-  GuildMember
+  PermissionsBitField
 } from 'discord.js';
 import { EventEmitter } from 'events';
 
 import { ChildChannelData, ParentChannelData, ParentChannelOptions } from './types';
 import { TempChannelsManagerEvents } from './TempChannelsManagerEvents';
-
-const isVoiceOrTextChannel = (c: ChildChannelData, id: Snowflake) =>
-  c.voiceChannel.id === id || c.textChannel?.id === id;
 
 /**
  * The temporary channels manager.
@@ -87,23 +79,10 @@ export class TempChannelsManager extends EventEmitter {
     this.client.on('channelDelete', async (channel: GuildChannel | DMChannel) =>
       this.#handleChannelDelete(channel as GuildChannel)
     );
-    this.client.on(
-      'threadUpdate',
-      async (oldState: ThreadChannel, newState: ThreadChannel) =>
-        this.#handleChannelUpdate(oldState, newState)
-    );
-    this.client.on('threadDelete', async (channel: ThreadChannel) =>
-      this.#handleChannelDelete(channel)
-    );
 
     this.on(
       TempChannelsManagerEvents.channelRegister,
       async (parent: ParentChannelData) => this.#handleRegistering(parent)
-    );
-    this.on(
-      TempChannelsManagerEvents.createText,
-      async (interactionOrMessage: Interaction | Message) =>
-        this.#handleTextCreation(interactionOrMessage)
     );
   }
 
@@ -128,8 +107,6 @@ export class TempChannelsManager extends EventEmitter {
       childAutoDeleteIfOwnerLeaves: false,
       childVoiceFormat: (name, count) => `[DRoom #${count}] ${name}`,
       childVoiceFormatRegex: /^\[DRoom #\d+\]\s+.+/i,
-      childTextFormat: (name, count) => `droom-${count}_${name}`,
-      childTextFormatRegex: /^droom-\d+_/i,
       childPermissionOverwriteOptions: { ['ManageChannels']: true },
     }
   ): void {
@@ -169,29 +146,16 @@ export class TempChannelsManager extends EventEmitter {
     }
 
     parent = this.channels.find((p: ParentChannelData) =>
-      p.children.some((c: ChildChannelData) =>
-        isVoiceOrTextChannel(c, channel.id)
-      )
+      p.children.some((c: ChildChannelData) => c.voiceChannel.id === channel.id)
     );
     if (!parent) return;
 
     const child = parent.children.find((c: ChildChannelData) =>
-      isVoiceOrTextChannel(c, channel.id)
+      c.voiceChannel.id === channel.id
     );
     if (!child) return;
 
-    const textChannel = child.textChannel;
-    if (textChannel?.id === channel.id) {
-      child.textChannel = null;
-      this.emit(TempChannelsManagerEvents.textChannelDelete, textChannel);
-      return;
-    }
-
     if (child.voiceChannel.id === channel.id) {
-      if (textChannel) {
-        await textChannel.delete();
-        this.emit(TempChannelsManagerEvents.textChannelDelete, textChannel);
-      }
       parent.children = parent.children.filter(
         (c) => c.voiceChannel.id !== channel.id
       );
@@ -217,15 +181,9 @@ export class TempChannelsManager extends EventEmitter {
 
     // reconstruct parent's children array when bot is ready
     if (parentChannel && parent.options.childVoiceFormatRegex) {
-      let textChildren = new Collection<Snowflake, TextChannel>();
       const voiceChildren = parentChannel.parent.children.cache.filter(
         (c) => parent.options.childVoiceFormatRegex.test(c.name) && c.type === ChannelType.GuildVoice && c.permissionOverwrites.cache.some((po) => po.type === OverwriteType.Member)
       );
-      if (parent.options.childTextFormatRegex) {
-        textChildren = parentChannel.parent.children.cache.filter(
-          (c) => parent.options.childTextFormatRegex.test(c.name) && c.type === ChannelType.GuildText && c.permissionOverwrites.cache.some((po) => po.type === OverwriteType.Member)
-        ) as Collection<Snowflake, TextChannel>;
-      }
 
       parent.children = await Promise.all(
         voiceChildren.map(async (child) => {
@@ -234,8 +192,7 @@ export class TempChannelsManager extends EventEmitter {
 
           const channelData: ChildChannelData = {
             owner,
-            voiceChannel: child as VoiceChannel,
-            textChannel: textChildren.find((c) => c.permissionOverwrites.cache.some((po) => po.type === OverwriteType.Member && po.id === ownerId)),
+            voiceChannel: child as VoiceChannel
           };
           return channelData;
         })
@@ -251,14 +208,6 @@ export class TempChannelsManager extends EventEmitter {
               (parent.options.childAutoDeleteIfOwnerLeaves &&
                 !child.voiceChannel.members.has(child.owner.id));
             if (childShouldBeDeleted) {
-              if (child.textChannel) {
-                await child.textChannel.delete();
-                this.emit(
-                  TempChannelsManagerEvents.textChannelDelete,
-                  child.textChannel
-                );
-              }
-
               await child.voiceChannel.delete();
               this.emit(
                 TempChannelsManagerEvents.voiceChannelDelete,
@@ -291,133 +240,24 @@ export class TempChannelsManager extends EventEmitter {
     const parent = this.channels.find((p) =>
       p.children.some(
         (c) =>
-          c.voiceChannel.id === oldState.id || c.textChannel?.id === oldState.id
+          c.voiceChannel.id === oldState.id
       )
     );
     if (!parent) return;
 
     const child = parent.children.find(
       (c) =>
-        c.voiceChannel.id === oldState.id || c.textChannel?.id === oldState.id
+        c.voiceChannel.id === oldState.id
     );
     if (!child) return;
 
-    const isVoice = newState.type === ChannelType.GuildVoice;
-    const nameDoesNotHavePrefix = isVoice
-      ? !parent.options.childVoiceFormatRegex.test(newState.name)
-      : !parent.options.childTextFormatRegex.test(newState.name);
-
+    const nameDoesNotHavePrefix = !parent.options.childVoiceFormatRegex.test(newState.name);
     if (!parent.options.childCanBeRenamed && nameDoesNotHavePrefix) {
       const count = parent.children.indexOf(child) + 1;
-      const name = isVoice
-        ? parent.options.childVoiceFormat(newState.name, count)
-        : parent.options.childTextFormat(newState.name, count);
+      const name = parent.options.childVoiceFormat(newState.name, count)
       newState.setName(name);
 
       this.emit(TempChannelsManagerEvents.childPrefixChange, newState);
-    }
-  }
-
-  async #handleTextCreation(
-    interactionOrMessage: Interaction | Message
-  ) {
-    async function createTextChannel(channelName: string): Promise<TextChannel> {
-      return (await interactionOrMessage.guild.channels.create({
-        name: channelName,
-        parent: parent.options.childCategory,
-        type: ChannelType.GuildText,
-        permissionOverwrites: [
-          {
-            id: owner.id,
-            type: OverwriteType.Member,
-            allow: PermissionsBitField.Flags.ManageChannels,
-          },
-        ],
-      })) as TextChannel;
-    }
-
-    async function createThreadChannel(
-      parentId: Snowflake,
-      channelName: string,
-      autoArchiveDuration: ThreadAutoArchiveDuration
-    ): Promise<ThreadChannel> {
-      const parentChannel = (await interactionOrMessage.guild.channels.fetch(
-        parentId
-      )) as TextChannel;
-      if (!parentChannel) return;
-
-      const thread = await parentChannel.threads.create({
-        name: channelName,
-        autoArchiveDuration,
-      });
-
-      thread.members.add(interactionOrMessage.member.user.id);
-
-      return thread;
-    }
-
-    if (!interactionOrMessage) return;
-
-    const owner = interactionOrMessage.member as GuildMember;
-    const voiceChannel = owner.voice.channel;
-    if (
-      !voiceChannel ||
-      !this.channels.some((p) =>
-        p.children.some((c) => c.voiceChannel.id === voiceChannel.id)
-      )
-    ) {
-      return this.emit(
-        TempChannelsManagerEvents.voiceNotExisting,
-        interactionOrMessage
-      );
-    }
-
-    const parent = this.channels.find((p) =>
-      p.children.some((c) => c.voiceChannel.id === voiceChannel.id)
-    );
-    if (!parent) return;
-
-    const child = parent.children.find(
-      (c) => c.voiceChannel.id === voiceChannel.id
-    );
-    if (!child || child.owner.id !== owner.id) {
-      return this.emit(
-        TempChannelsManagerEvents.voiceNotExisting,
-        interactionOrMessage
-      );
-    }
-
-    if (!child.textChannel) {
-      const count = parent.children.indexOf(child) + 1;
-      const newChannelName = parent.options.childTextFormat(
-        owner.displayName,
-        count
-      );
-
-      child.textChannel = parent.options.textChannelAsThreadParent
-        ? await createThreadChannel(
-          parent.options.textChannelAsThreadParent,
-          newChannelName,
-          parent.options.threadArchiveDuration ?? 60
-        )
-        : await createTextChannel(newChannelName);
-
-      return this.emit(
-        TempChannelsManagerEvents.textChannelCreate,
-        child.textChannel,
-        interactionOrMessage
-      );
-    } else {
-      const textChannel = child.textChannel;
-      child.textChannel = null;
-
-      await textChannel?.delete();
-
-      return this.emit(
-        TempChannelsManagerEvents.textChannelDelete,
-        textChannel,
-        interactionOrMessage
-      );
     }
   }
 
@@ -450,14 +290,6 @@ export class TempChannelsManager extends EventEmitter {
           !oldState.channel.members.has(child.owner.id));
       if (childShouldBeDeleted) {
         try {
-          if (child.textChannel) {
-            await child.textChannel.delete();
-            this.emit(
-              TempChannelsManagerEvents.textChannelDelete,
-              child.textChannel
-            );
-          }
-
           await child.voiceChannel.delete();
           this.emit(
             TempChannelsManagerEvents.voiceChannelDelete,
@@ -581,35 +413,6 @@ export class TempChannelsManager extends EventEmitter {
  * @param {Discord.VoiceChannel} voiceChannel The voice channel
  * @example
  * manager.on('voiceChannelDelete', (voiceChannel) => {});
- */
-
-/**
- * Emitted when a text channel is created but the user is not an owner of a voice channel.
- * @event TempChannelsManager#voiceNotExisting
- * @see TempChannelsManagerEvents#voiceNotExisting
- * @param {Discord.Interaction | Discord.Message} interactionOrMessage Either the interaction or the message that triggered the activity
- * @example
- * manager.on('voiceNotExisting', (interactionOrMessage) => {});
- */
-
-/**
- * Emitted when a text channel is created.
- * @event TempChannelsManager#textChannelCreate
- * @see TempChannelsManagerEvents#textChannelCreate
- * @param {Discord.TextChannel | Discord.ThreadChannel} textChannel The text channel
- * @param {Discord.Interaction | Discord.Message} interactionOrMessage Either the interaction or the message that triggered the activity
- * @example
- * manager.on('textChannelCreate', (textChannel, interactionOrMessage) => {});
- */
-
-/**
- * Emitted when a text channel is deleted.
- * @event TempChannelsManager#textChannelDelete
- * @see TempChannelsManagerEvents#textChannelDelete
- * @param {Discord.TextChannel | Discord.ThreadChannel} textChannel The text channel
- * @param {Discord.Interaction | Discord.Message} interactionOrMessage Either the interaction or the message that triggered the activity
- * @example
- * manager.on('textChannelDelete', (textChannel, interactionOrMessage) => {});
  */
 
 /**

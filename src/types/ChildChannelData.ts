@@ -1,8 +1,6 @@
 import {
   GuildMember,
-  TextChannel,
-  ThreadChannel,
-  VoiceChannel,
+  VoiceChannel
 } from 'discord.js';
 
 /**
@@ -27,12 +25,4 @@ export interface ChildChannelData {
    * @memberof ChildChannelData
    */
   voiceChannel: VoiceChannel;
-
-  /**
-   * The optional text/thread channel
-   *
-   * @type {TextChannel | ThreadChannel}
-   * @memberof ChildChannelData
-   */
-  textChannel?: TextChannel | ThreadChannel;
 }
