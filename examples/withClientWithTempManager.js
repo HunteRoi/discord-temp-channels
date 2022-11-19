@@ -21,7 +21,9 @@ client.on('ready', () => {
     childAutoDeleteIfOwnerLeaves: false,
     childAutoDeleteIfParentGetsUnregistered: true,
     childVoiceFormat: (str, count) => `Example #${count} | ${str}`,
-    childVoiceFormatRegex: /^Example #\d+ \|/
+    childVoiceFormatRegex: /^Example #\d+ \|/,
+    childMaxUsers: 0,
+    childBitrate: 96000
   });
 
   client.on('messageCreate', (message) => message.content === 'unregister' && manager.unregisterChannel('CHANNEL_ID'));
