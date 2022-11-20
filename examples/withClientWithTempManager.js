@@ -23,7 +23,7 @@ client.on('ready', () => {
     childVoiceFormat: (str, count) => `Example #${count} | ${str}`,
     childVoiceFormatRegex: /^Example #\d+ \|/,
     childMaxUsers: 0,
-    childBitrate: 96000
+    childBitrate: 64000
   });
 
   client.on('messageCreate', (message) => message.content === 'unregister' && manager.unregisterChannel('CHANNEL_ID'));
