@@ -22,7 +22,7 @@ client.on('ready', () => {
     childAutoDeleteIfParentGetsUnregistered: true,
     childVoiceFormat: (str, count) => `Example #${count} | ${str}`,
     childVoiceFormatRegex: /^Example #\d+ \|/,
-    childMaxUsers: 0,
+    childMaxUsers: 3,
     childBitrate: 64000
   });
 
