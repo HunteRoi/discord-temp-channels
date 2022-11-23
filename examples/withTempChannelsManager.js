@@ -23,7 +23,9 @@ client.on('ready', () => {
     childAutoDeleteIfParentGetsUnregistered: true,
     childAutoDeleteIfOwnerLeaves: false,
     childVoiceFormat: (str, count) => `Example #${count} | ${str}`,
-    childVoiceFormatRegex: /^Example #\d+ \|/
+    childVoiceFormatRegex: /^Example #\d+ \|/,
+    childMaxUsers: 3,
+    childBitrate: 64000
   });
 });
 
