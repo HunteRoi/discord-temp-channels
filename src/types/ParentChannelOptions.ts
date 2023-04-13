@@ -107,4 +107,13 @@ export interface ParentChannelOptions {
    * @memberof ParentChannelOptions
    */
   childOverwriteRolesAndUsers?: Resolvables[];
+
+  /**
+   * Whether the child channel should be a clone of the parent's channel or not.
+   * Defaults to false.
+   *
+   * @type {boolean}
+   * @memberof ParentChannelOptions
+   */
+  childShouldBeACopyOfParent?: boolean;
 }

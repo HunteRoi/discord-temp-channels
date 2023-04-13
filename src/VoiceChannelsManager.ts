@@ -33,9 +33,7 @@ export class VoiceChannelsManager extends EventEmitter {
      * @return {*}  {ParentChannelData}
      * @memberof VoiceChannelsManager
      */
-    protected getParentChannel(channelId: Snowflake): ParentChannelData;
-    protected getParentChannel(channelId: Snowflake, lookAsChild: boolean): ParentChannelData;
-    protected getParentChannel(channelId: Snowflake, lookAsChild = false): ParentChannelData {
+    protected getParentChannel(channelId: Snowflake, lookAsChild: boolean = false): ParentChannelData {
         if (lookAsChild) {
             return this.#channels.find(parent =>
                 parent.children.some(child => child.voiceChannel.id === channelId)
@@ -109,7 +107,7 @@ export class VoiceChannelsManager extends EventEmitter {
     public unbindChannelFromParent(parent: ParentChannelData, voiceChannelId: Snowflake): void {
         if (!parent) return;
 
-        const index = parent.children.findIndex(child => child.voiceChannel.id === voiceChannelId);
+        const index = parent.children.findIndex(c => c.voiceChannel.id === voiceChannelId);
         if (index === -1) return;
 
         const [child] = parent.children.splice(index, 1);

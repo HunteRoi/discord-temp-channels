@@ -1,6 +1,6 @@
 {
   "name": "@hunteroi/discord-temp-channels",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "Based on Androz2091's package, this is a simple framework to facilitate the creation of a temporary voice & text channels system using Discord.js",
   "main": "lib/index.js",
   "bugs": {
@@ -22,8 +22,7 @@
   "scripts": {
     "build": "tsc",
     "build:docs": "typedoc",
-    "prepublish": "yarn build:docs",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\" \"examples/**/*.ts\" \"examples/**/*.js\" ",
+    "prepublish": "yarn lint && yarn build && yarn build:docs",
     "lint": "tslint -p tsconfig.json",
     "start": "yarn build & node ./examples/index.js",
     "start:example2": "yarn build & node ./examples/index2.js"

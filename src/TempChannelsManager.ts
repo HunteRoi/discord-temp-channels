@@ -56,16 +56,17 @@ export class TempChannelsManager extends VoiceChannelsManager {
             childVoiceFormat: (name, count) => `[DRoom #${count}] ${name}`,
             childVoiceFormatRegex: /^\[DRoom #\d+\]\s+.+/i,
             childPermissionOverwriteOptions: { 'ManageChannels': true },
+            childShouldBeACopyOfParent: false
         }
     ): void {
         super.registerChannel(channelId, options);
     }
 
     /**
-   * Unregisters a parent channel. When a user joins it, nothing will happen.
-   *
-   * @param {Snowflake} channelId
-   */
+     * Unregisters a parent channel. When a user joins it, nothing will happen.
+     *
+     * @param {Snowflake} channelId
+     */
     public unregisterChannel(channelId: Snowflake): boolean {
         const hasBeenUnregistered = super.unregisterChannel(channelId);
         if (!hasBeenUnregistered) {
@@ -173,14 +174,25 @@ export class TempChannelsManager extends VoiceChannelsManager {
             categoryChannel = await channel.guild.channels.fetch(parentChannel.parentId) as CategoryChannel;
         }
 
-        const voiceChannel = await channel.guild.channels.create({
-            name,
-            parent: categoryChannel?.id ?? null,
-            bitrate: parent.options.childBitrate,
-            userLimit: parent.options.childMaxUsers,
-            type: ChannelType.GuildVoice,
-            permissionOverwrites: categoryChannel ? [...categoryChannel.permissionOverwrites.cache.values()] : []
-        });
+        let voiceChannel: VoiceChannel | null = null;
+        if (parent.options.childShouldBeACopyOfParent) {
+            voiceChannel = await parentChannel.clone({
+                name,
+                parent: categoryChannel?.id ?? null,
+                bitrate: parent.options.childBitrate,
+                userLimit: parent.options.childMaxUsers
+            });
+        } else {
+            voiceChannel = await channel.guild.channels.create({
+                name,
+                parent: categoryChannel?.id ?? null,
+                bitrate: parent.options.childBitrate,
+                userLimit: parent.options.childMaxUsers,
+                type: ChannelType.GuildVoice,
+                permissionOverwrites: categoryChannel ? [...categoryChannel.permissionOverwrites.cache.values()] : []
+            });
+        }
+
         await voiceChannel.permissionOverwrites.edit(member.id, { 'ManageChannels': true });
         if (parent.options.childPermissionOverwriteOptions) {
             for (const roleOrUser of parent.options.childOverwriteRolesAndUsers) {

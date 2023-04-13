@@ -25,7 +25,8 @@ client.on('ready', () => {
     childVoiceFormat: (str, count) => `Example #${count} | ${str}`,
     childVoiceFormatRegex: /^Example #\d+ \|/,
     childMaxUsers: 3,
-    childBitrate: 64000
+    childBitrate: 64000,
+    childShouldBeACopyOfParent: false
   });
 });
 
