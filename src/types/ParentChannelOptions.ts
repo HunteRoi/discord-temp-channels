@@ -79,6 +79,8 @@ export interface ParentChannelOptions {
   /**
    * The maximum number of users in a child channel.
    *
+   * @remark Will be ignored if {@link childShouldBeACopyOfParent} is set to true.
+   *
    * @type {number}
    * @memberof ParentChannelOptions
    */
@@ -86,6 +88,8 @@ export interface ParentChannelOptions {
 
   /**
    * The bitrate of a child voice channel.
+   *
+   * @remark Will be ignored if {@link childShouldBeACopyOfParent} is set to true.
    *
    * @type {number}
    * @memberof ParentChannelOptions
@@ -110,8 +114,12 @@ export interface ParentChannelOptions {
 
   /**
    * Whether the child channel should be a clone of the parent's channel or not.
-   * Defaults to false.
    *
+   * @remark Setting this parameter to true will force the manager to fully clone the parent's channel,
+   * giving no use to {@link childBitrate} and {@link childMaxUsers}. Only the name of the child channel
+   * will be customized.
+   *
+   * @default false
    * @type {boolean}
    * @memberof ParentChannelOptions
    */
