@@ -177,10 +177,7 @@ export class TempChannelsManager extends VoiceChannelsManager {
         let voiceChannel: VoiceChannel | null = null;
         if (parent.options.childShouldBeACopyOfParent) {
             voiceChannel = await parentChannel.clone({
-                name,
-                parent: categoryChannel?.id ?? null,
-                bitrate: parent.options.childBitrate,
-                userLimit: parent.options.childMaxUsers
+                name
             });
         } else {
             voiceChannel = await channel.guild.channels.create({
