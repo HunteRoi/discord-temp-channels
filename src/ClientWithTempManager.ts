@@ -21,7 +21,7 @@ export class ClientWithTempManager extends Client {
    * @param {ClientOptions} [options] Options for the client
    * @memberof ClientWithTempManager
    */
-  constructor(options?: ClientOptions) {
+  constructor(options: ClientOptions) {
     super(options);
 
     this.tempChannelsManager = new TempChannelsManager(this);

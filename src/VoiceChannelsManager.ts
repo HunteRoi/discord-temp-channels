@@ -30,10 +30,10 @@ export class VoiceChannelsManager extends EventEmitter {
      * @protected
      * @param {Snowflake} channelId
      * @param {boolean} [lookAsChild=false]
-     * @return {*}  {ParentChannelData}
+     * @return {ParentChannelData | undefined}
      * @memberof VoiceChannelsManager
      */
-    protected getParentChannel(channelId: Snowflake, lookAsChild: boolean = false): ParentChannelData {
+    protected getParentChannel(channelId: Snowflake, lookAsChild: boolean = false): ParentChannelData | undefined {
         if (lookAsChild) {
             return this.#channels.find(parent =>
                 parent.children.some(child => child.voiceChannel.id === channelId)

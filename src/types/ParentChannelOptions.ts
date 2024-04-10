@@ -5,6 +5,12 @@ import {
   UserResolvable,
 } from 'discord.js';
 
+/**
+ * A specific type that can be either a role or a user.
+ *
+ * @type {RoleResolvable | UserResolvable}
+ * @see {@link https://discord.js.org/docs/packages/discord.js/14.14.1/RoleResolvable:TypeAlias} and {@link https://discord.js.org/docs/packages/discord.js/14.14.1/UserResolvable:TypeAlias} for more information.
+ */
 type Resolvables = RoleResolvable | UserResolvable;
 
 /**
@@ -25,10 +31,10 @@ export interface ParentChannelOptions {
   /**
    * The category in which the child channels should be created.
    *
-   * @type {Snowflake}
+   * @type {Snowflake? | null}
    * @memberof ParentChannelOptions
    */
-  childCategory?: Snowflake;
+  childCategory?: Snowflake | null;
 
   /**
    * Whether the child channel should be removed when empty.

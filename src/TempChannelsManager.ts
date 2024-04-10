@@ -1,5 +1,5 @@
-import { CategoryChannel, ChannelType, Client, DMChannel, Events, Guild, GuildMember, IntentsBitField, NonThreadGuildBasedChannel, OverwriteType, PermissionsBitField, Snowflake, VoiceChannel } from 'discord.js';
-import { ChildChannelData, ParentChannelData, ParentChannelOptions } from './types';
+import { CategoryChannel, ChannelType, Client, DMChannel, Events, GuildMember, IntentsBitField, NonThreadGuildBasedChannel, OverwriteType, Snowflake, VoiceChannel } from 'discord.js';
+import { ChildChannelData, ParentChannelData, ParentChannelOptions } from './types'; // eslint-disable-line @typescript-eslint/no-unused-vars
 import { VoiceChannelsManager } from './VoiceChannelsManager';
 import { TempChannelsManagerEvents } from './TempChannelsManagerEvents';
 import addDiscordLogs from 'discord-logs';
@@ -106,16 +106,21 @@ export class TempChannelsManager extends VoiceChannelsManager {
         if (!parentData) return;
 
         const parent = this.getParentChannel(parentData.channelId);
+        if (!parent) return;
+
         const voiceChannel = await this.client.channels.fetch(parent.channelId) as VoiceChannel;
         if (!voiceChannel) return;
 
-        const bot = await voiceChannel.guild.members.fetch(this.client.user);
-        const category = await voiceChannel.guild.channels.fetch(parent.options.childCategory ?? voiceChannel.parentId) as CategoryChannel;
+        const bot = await voiceChannel.guild.members.fetch(this.client.user!);
+
+        const parentId = parent.options.childCategory ?? voiceChannel.parentId;
+        if (!parentId) return;
+        const category = await voiceChannel.guild.channels.fetch(parentId) as CategoryChannel;
         const children = (category?.children ?? voiceChannel.guild.channels).cache
             .filter(c => parent.options.childVoiceFormatRegex.test(c.name) && c.type === ChannelType.GuildVoice && c.permissionOverwrites.cache.some((po) => po.type === OverwriteType.Member));
         for (let child of [...children.values()] as VoiceChannel[]) {
             child = await this.client.channels.fetch(child.id) as VoiceChannel;
-            this.bindChannelToParent(parent, child, child.members.size > 0 ? child.members.first() : bot);
+            this.bindChannelToParent(parent, child, child.members.size > 0 ? child.members.first()! : bot);
             await this.#checkChildForDeletion(child);
         }
     }
@@ -128,6 +133,7 @@ export class TempChannelsManager extends VoiceChannelsManager {
         if (!parent) return;
 
         const child = parent.children.find(c => c.voiceChannel.id === newState.id);
+        if (!child) return;
         const nameDoesNotHavePrefix = !parent.options.childVoiceFormatRegex.test(newState.name);
         if (!parent.options.childCanBeRenamed && nameDoesNotHavePrefix) {
             const count = parent.children.indexOf(child) + 1;
@@ -143,6 +149,7 @@ export class TempChannelsManager extends VoiceChannelsManager {
         if (!parent) return;
 
         const child = parent.children.find(c => c.voiceChannel.id === channel.id);
+        if (!child) return;
         const shouldBeDeleted = (parent.options.childAutoDeleteIfEmpty && child.voiceChannel.members.size === 0)
             || (parent.options.childAutoDeleteIfOwnerLeaves && !child.voiceChannel.members.has(child.owner.id));
         if (!shouldBeDeleted) return;
@@ -162,8 +169,9 @@ export class TempChannelsManager extends VoiceChannelsManager {
         const parentChannel = await this.client.channels.fetch(parent.channelId) as VoiceChannel;
         const count = Math.max(
             0,
-            ...parent.children.map(child => Number(child.voiceChannel.name.match(/\d+/).shift()))
+            ...parent.children.map(child => Number((child.voiceChannel.name.match(/\d+/) ?? [0]).shift()))
         );
+
         const name = parent.options.childVoiceFormat(member.displayName, count + 1);
 
         let categoryChannel: CategoryChannel | null = null;
@@ -192,7 +200,7 @@ export class TempChannelsManager extends VoiceChannelsManager {
 
         await voiceChannel.permissionOverwrites.edit(member.id, { 'ManageChannels': true });
         if (parent.options.childPermissionOverwriteOptions) {
-            for (const roleOrUser of parent.options.childOverwriteRolesAndUsers) {
+            for (const roleOrUser of parent.options.childOverwriteRolesAndUsers ?? []) {
                 try {
                     await voiceChannel.permissionOverwrites.edit(roleOrUser, parent.options.childPermissionOverwriteOptions);
                 }
