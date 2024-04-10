@@ -1,6 +1,7 @@
 {
   "name": "@hunteroi/discord-temp-channels",
-  "version": "3.2.0",
+  "version": "3.2.1",
+  "type": "module",
   "description": "Based on Androz2091's package, this is a simple framework to facilitate the creation of a temporary voice & text channels system using Discord.js",
   "main": "lib/index.js",
   "bugs": {
@@ -16,14 +17,14 @@
   "author": "HunteRoi <me@tinaeldevresse.eu> (https://tinaeldevresse.eu/)",
   "funding": "https://github.com/sponsors/hunteroi",
   "engines": {
-    "node": ">=16.6.0"
+    "node": ">=20.x"
   },
   "license": "MIT",
   "scripts": {
     "build": "tsc",
     "build:docs": "typedoc",
     "prepublish": "yarn lint && yarn build && yarn build:docs",
-    "lint": "tslint -p tsconfig.json",
+    "lint": "eslint ./src",
     "start": "yarn build & node ./examples/index.js",
     "start:example2": "yarn build & node ./examples/index2.js"
   },
@@ -32,11 +33,12 @@
     "discord.js": "14.x"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
     "discord-sync-commands": "^0.3.0",
-    "tslint": "^6.1.3",
-    "tslint-config-prettier": "^1.18.0",
-    "typedoc": "^0.23.21",
-    "typescript": "^4.8.4"
+    "eslint": "^9.0.0",
+    "typedoc": "^0.25.13",
+    "typescript": "^5.4.4",
+    "typescript-eslint": "^7.6.0"
   },
   "directories": {
     "lib": "lib"

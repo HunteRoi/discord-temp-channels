@@ -8,15 +8,16 @@
     "resolveJsonModule": true,
     "strictNullChecks": false,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "moduleResolution": "node"
   },
   "include": ["src/**/*"],
   "exclude": ["lib/*", "node_modules/*"],
   "typedocOptions": {
     "entryPoints": ["src/index.ts"],
     "out": "docs/api-docs",
-    "exclude": ["node_modules"],
     "excludePrivate": true,
+    "excludeExternals": true,
     "hideGenerator": true
   }
 }
