@@ -13,7 +13,7 @@ the support of this feature in this new major version.
 
 ## No more voiceChannelCreate & voiceChannelDelete events
 The events related to voice channel creation and deletion have been removed. Why do they exist
-in the first place to be honnest?
+in the first place to be honest?
 
 ## childCreate becomes childAdd & childDelete becomes childRemove
 The `childCreate` and `childDelete` events have been renamed as `childAdd` and `childRemove`.
