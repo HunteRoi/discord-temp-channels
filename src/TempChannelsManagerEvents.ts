@@ -1,10 +1,10 @@
 export enum TempChannelsManagerEvents {
-  channelRegister = 'channelRegister',
-  channelUnregister = 'channelUnregister',
+    channelRegister = "channelRegister",
+    channelUnregister = "channelUnregister",
 
-  childAdd = 'childAdd',
-  childRemove = 'childRemove',
-  childPrefixChange = 'childPrefixChange',
+    childAdd = "childAdd",
+    childRemove = "childRemove",
+    childPrefixChange = "childPrefixChange",
 
-  error = 'error',
+    error = "error",
 }
