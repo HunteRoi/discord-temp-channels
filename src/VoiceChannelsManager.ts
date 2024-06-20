@@ -5,12 +5,13 @@ import {
     type Snowflake,
     type VoiceChannel,
 } from "discord.js";
-import { TempChannelsManagerEvents } from "./TempChannelsManagerEvents";
+
+import { TempChannelsManagerEvents } from "./TempChannelsManagerEvents.js";
 import type {
     ChildChannelData,
     ParentChannelData,
     ParentChannelOptions,
-} from "./types";
+} from "./types/index.js";
 
 /**
  * A voice channels manager, handling the relationship between parents and children channels.

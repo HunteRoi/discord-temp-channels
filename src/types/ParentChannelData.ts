@@ -1,5 +1,7 @@
 import type { Snowflake } from "discord.js";
-import type { ChildChannelData, ParentChannelOptions } from "./";
+
+import type { ChildChannelData } from "./ChildChannelData.js";
+import type { ParentChannelOptions } from "./ParentChannelOptions.js";
 
 /**
  * The data about the channel allowing creation of temporary channels

@@ -1,4 +1,3 @@
-import addDiscordLogs from "discord-logs";
 import {
     type CategoryChannel,
     ChannelType,
@@ -12,13 +11,15 @@ import {
     type Snowflake,
     type VoiceChannel,
 } from "discord.js";
-import { TempChannelsManagerEvents } from "./TempChannelsManagerEvents";
-import { VoiceChannelsManager } from "./VoiceChannelsManager";
+
+import { TempChannelsManagerEvents } from "./TempChannelsManagerEvents.js";
+import { VoiceChannelsManager } from "./VoiceChannelsManager.js";
 import {
     ChildChannelData,
     type ParentChannelData,
     type ParentChannelOptions,
-} from "./types"; // eslint-disable-line @typescript-eslint/no-unused-vars
+} from "./types/index.js";
+
 /**
  * The temporary channels manager.
  * @export
@@ -49,7 +50,6 @@ export class TempChannelsManager extends VoiceChannelsManager {
 
         this.client = client;
         this.#listenToChannelEvents();
-        addDiscordLogs(client);
     }
 
     /**
@@ -99,29 +99,34 @@ export class TempChannelsManager extends VoiceChannelsManager {
     }
 
     #listenToChannelEvents(): void {
-        this.client.on(
-            "voiceChannelJoin",
-            async (member: GuildMember, channel: VoiceChannel) =>
-                await this.#createNewChild.apply(this, [member, channel]),
-        );
-        this.client.on(
-            "voiceChannelSwitch",
-            async (
-                member: GuildMember,
-                previousChannel: VoiceChannel,
-                currentChannel: VoiceChannel,
-            ) =>
+        this.client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
+            if (!oldState.channel && newState.channel && newState.member) {
+                // User joins a channel
+                await this.#createNewChild.apply(this, [
+                    newState.member,
+                    newState.channel as VoiceChannel,
+                ]);
+            }
+            if (oldState.channel && !newState.channel) {
+                // User leaves a channel
+                await this.#checkChildForDeletion.apply(this, [
+                    oldState.channel as VoiceChannel,
+                ]);
+            }
+            if (
+                oldState.channel &&
+                newState.channel &&
+                oldState.channel.id !== newState.channel.id &&
+                newState.member
+            ) {
+                // User moves to another channel
                 await this.#handleChild.apply(this, [
-                    member,
-                    previousChannel,
-                    currentChannel,
-                ]),
-        );
-        this.client.on(
-            "voiceChannelLeave",
-            async (member: GuildMember, channel: VoiceChannel) =>
-                await this.#checkChildForDeletion.apply(this, [channel]),
-        );
+                    newState.member,
+                    oldState.channel as VoiceChannel,
+                    newState.channel as VoiceChannel,
+                ]);
+            }
+        });
 
         this.client.on(
             Events.ChannelUpdate,

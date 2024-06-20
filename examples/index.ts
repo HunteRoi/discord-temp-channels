@@ -1,5 +1,6 @@
-const { Client, IntentsBitField } = require('discord.js');
-const { TempChannelsManager, TempChannelsManagerEvents } = require('../lib');
+import { Client, IntentsBitField } from 'discord.js';
+
+import { TempChannelsManager, TempChannelsManagerEvents } from '../lib/index.js';
 
 const client = new Client({
   intents: [
@@ -17,7 +18,7 @@ const manager = new TempChannelsManager(client);
 client.on('ready', () => {
   console.log('Connected!');
 
-  manager.registerChannel('CHANNEL_ID', {
+  manager.registerChannel('VOICE_CHANNEL_ID', {
     childCategory: 'CATEGORY_ID',
     childAutoDeleteIfEmpty: true,
     childAutoDeleteIfParentGetsUnregistered: true,
@@ -30,7 +31,10 @@ client.on('ready', () => {
   });
 });
 
-client.on('messageCreate', (message) => message.content === 'unregister' && manager.unregisterChannel('CHANNEL_ID'));
+client.on('messageCreate', (message) => {
+  if (message.content === 'unregister')
+    manager.unregisterChannel('VOICE_CHANNEL_ID');
+});
 
 manager.on(TempChannelsManagerEvents.channelRegister, (parent) => console.log('Registered', parent));
 manager.on(TempChannelsManagerEvents.channelUnregister, (parent) => console.log('Unregistered', parent));
