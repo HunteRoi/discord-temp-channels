@@ -1,7 +1,17 @@
-import { Collection, GuildMember, Snowflake, VoiceChannel } from 'discord.js';
-import { ChildChannelData, ParentChannelData, ParentChannelOptions } from './types';
-import { EventEmitter } from 'events';
-import { TempChannelsManagerEvents } from './TempChannelsManagerEvents';
+import { EventEmitter } from "node:events";
+import {
+    Collection,
+    type GuildMember,
+    type Snowflake,
+    type VoiceChannel,
+} from "discord.js";
+
+import { TempChannelsManagerEvents } from "./TempChannelsManagerEvents.js";
+import type {
+    ChildChannelData,
+    ParentChannelData,
+    ParentChannelOptions,
+} from "./types/index.js";
 
 /**
  * A voice channels manager, handling the relationship between parents and children channels.
@@ -30,13 +40,18 @@ export class VoiceChannelsManager extends EventEmitter {
      * @protected
      * @param {Snowflake} channelId
      * @param {boolean} [lookAsChild=false]
-     * @return {*}  {ParentChannelData}
+     * @return {ParentChannelData | undefined}
      * @memberof VoiceChannelsManager
      */
-    protected getParentChannel(channelId: Snowflake, lookAsChild: boolean = false): ParentChannelData {
+    protected getParentChannel(
+        channelId: Snowflake,
+        lookAsChild = false,
+    ): ParentChannelData | undefined {
         if (lookAsChild) {
-            return this.#channels.find(parent =>
-                parent.children.some(child => child.voiceChannel.id === channelId)
+            return this.#channels.find((parent) =>
+                parent.children.some(
+                    (child) => child.voiceChannel.id === channelId,
+                ),
             );
         }
         return this.#channels.get(channelId);
@@ -50,7 +65,10 @@ export class VoiceChannelsManager extends EventEmitter {
      * @param {ParentChannelOptions} options
      * @memberof VoiceChannelsManager
      */
-    public registerChannel(channelId: Snowflake, options: ParentChannelOptions): void {
+    public registerChannel(
+        channelId: Snowflake,
+        options: ParentChannelOptions,
+    ): void {
         const parent: ParentChannelData = { channelId, options, children: [] };
         this.#channels.set(channelId, parent);
         this.emit(TempChannelsManagerEvents.channelRegister, parent);
@@ -71,7 +89,9 @@ export class VoiceChannelsManager extends EventEmitter {
         const unregisteredSuccessfully = this.#channels.delete(channelId);
         if (unregisteredSuccessfully) {
             this.emit(TempChannelsManagerEvents.channelUnregister, parent);
-            parent.children.forEach(child => this.unbindChannelFromParent(parent, child.voiceChannel.id));
+            for (const child of parent.children) {
+                this.unbindChannelFromParent(parent, child.voiceChannel.id);
+            }
         }
 
         return unregisteredSuccessfully;
@@ -87,7 +107,11 @@ export class VoiceChannelsManager extends EventEmitter {
      * @return {*}  {void}
      * @memberof VoiceChannelsManager
      */
-    public bindChannelToParent(parent: ParentChannelData, voiceChannel: VoiceChannel, owner: GuildMember): void {
+    public bindChannelToParent(
+        parent: ParentChannelData,
+        voiceChannel: VoiceChannel,
+        owner: GuildMember,
+    ): void {
         if (!parent) return;
 
         const child: ChildChannelData = { owner, voiceChannel };
@@ -104,10 +128,15 @@ export class VoiceChannelsManager extends EventEmitter {
      * @return {*}  {void}
      * @memberof VoiceChannelsManager
      */
-    public unbindChannelFromParent(parent: ParentChannelData, voiceChannelId: Snowflake): void {
+    public unbindChannelFromParent(
+        parent: ParentChannelData,
+        voiceChannelId: Snowflake,
+    ): void {
         if (!parent) return;
 
-        const index = parent.children.findIndex(c => c.voiceChannel.id === voiceChannelId);
+        const index = parent.children.findIndex(
+            (c) => c.voiceChannel.id === voiceChannelId,
+        );
         if (index === -1) return;
 
         const [child] = parent.children.splice(index, 1);

@@ -1,49 +1,48 @@
 {
-  "name": "@hunteroi/discord-temp-channels",
-  "version": "3.2.1",
-  "type": "module",
-  "description": "Based on Androz2091's package, this is a simple framework to facilitate the creation of a temporary voice & text channels system using Discord.js",
-  "main": "lib/index.js",
+  "author": "HunteRoi <me@tinaeldevresse.eu> (https://tinaeldevresse.eu/)",
   "bugs": {
     "url": "https://github.com/HunteRoi/discord-temp-channels/issues"
   },
+  "dependencies": {},
+  "description": "Based on Androz2091's package, this is a simple framework to facilitate the creation of a temporary voice & text channels system using Discord.js",
+  "devDependencies": {
+    "@biomejs/biome": "1.6.4",
+    "@types/node": "^20.14.6",
+    "discord.js": "^14.15.3",
+    "typedoc": "^0.25.13",
+    "typescript": "^5.4.5"
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "engines": {
+    "node": ">=20.x"
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "funding": "https://github.com/sponsors/hunteroi",
   "homepage": "https://github.com/HunteRoi/discord-temp-channels#readme",
   "keywords": [
     "discordjs",
     "temporary channels",
     "discordbot"
   ],
-  "repository": "git://github.com/hunteroi/discord-temp-channels.git",
-  "author": "HunteRoi <me@tinaeldevresse.eu> (https://tinaeldevresse.eu/)",
-  "funding": "https://github.com/sponsors/hunteroi",
-  "engines": {
-    "node": ">=20.x"
-  },
   "license": "MIT",
+  "main": "lib/index.js",
+  "name": "@hunteroi/discord-temp-channels",
+  "peerDependencies": {
+    "discord.js": "^14.x"
+  },
+  "repository": "git://github.com/hunteroi/discord-temp-channels.git",
   "scripts": {
     "build": "tsc",
     "build:docs": "typedoc",
+    "lint": "biome check --apply ./src",
     "prepublish": "yarn lint && yarn build && yarn build:docs",
-    "lint": "eslint ./src",
-    "start": "yarn build & node ./examples/index.js",
-    "start:example2": "yarn build & node ./examples/index2.js"
+    "start": "yarn build && tsc ./examples/index.ts --target esnext --module nodenext --moduleResolution nodenext && node ./examples/index.js",
+    "start:2": "yarn build && tsc ./examples/index2.ts --target esnext --module nodenext --moduleResolution nodenext && node ./examples/index2.js"
   },
-  "dependencies": {
-    "discord-logs": "^2.2.1",
-    "discord.js": "14.x"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.0.0",
-    "discord-sync-commands": "^0.3.0",
-    "eslint": "^9.0.0",
-    "typedoc": "^0.25.13",
-    "typescript": "^5.4.4",
-    "typescript-eslint": "^7.6.0"
-  },
-  "directories": {
-    "lib": "lib"
-  },
-  "files": [
-    "lib/**/*"
-  ]
+  "type": "module",
+  "version": "3.3.0"
 }
