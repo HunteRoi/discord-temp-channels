@@ -11,7 +11,7 @@ import type {
  * @type {RoleResolvable | UserResolvable}
  * @see {@link https://discord.js.org/docs/packages/discord.js/14.14.1/RoleResolvable:TypeAlias} and {@link https://discord.js.org/docs/packages/discord.js/14.14.1/UserResolvable:TypeAlias} for more information.
  */
-type Resolvables = RoleResolvable | UserResolvable;
+export type Resolvables = RoleResolvable | UserResolvable;
 
 /**
  * The configuration for the channel that triggers the system.

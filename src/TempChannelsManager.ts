@@ -13,12 +13,13 @@ import {
 } from "discord.js";
 
 import { TempChannelsManagerEvents } from "./TempChannelsManagerEvents.js";
-import { VoiceChannelsManager } from "./VoiceChannelsManager.js";
 import {
+    // biome-ignore lint/correctness/noUnusedImports: actually used in the JSDocs
     ChildChannelData,
     type ParentChannelData,
     type ParentChannelOptions,
 } from "./types/index.js";
+import { VoiceChannelsManager } from "./VoiceChannelsManager.js";
 
 /**
  * The temporary channels manager.

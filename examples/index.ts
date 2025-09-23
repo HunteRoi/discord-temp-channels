@@ -15,7 +15,7 @@ const client = new Client({
 
 const manager = new TempChannelsManager(client);
 
-client.on('ready', () => {
+client.on('clientReady', () => {
   console.log('Connected!');
 
   manager.registerChannel('VOICE_CHANNEL_ID', {
