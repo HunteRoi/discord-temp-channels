@@ -6,11 +6,11 @@
   "dependencies": {},
   "description": "Based on Androz2091's package, this is a simple framework to facilitate the creation of a temporary voice & text channels system using Discord.js",
   "devDependencies": {
-    "@biomejs/biome": "2.2.4",
-    "@types/node": "^24.5.2",
-    "discord.js": "^14.22.1",
-    "typedoc": "^0.28.13",
-    "typescript": "^5.9.2"
+    "@biomejs/biome": "2.5.0",
+    "@types/node": "^26.0.0",
+    "discord.js": "^14.26.4",
+    "typedoc": "^0.28.19",
+    "typescript": "^6.0.3"
   },
   "directories": {
     "lib": "lib"
@@ -44,5 +44,5 @@
     "start:2": "yarn build && tsc ./examples/index2.ts --target esnext --module nodenext --moduleResolution nodenext && node ./examples/index2.js"
   },
   "type": "module",
-  "version": "3.3.1"
+  "version": "3.3.2"
 }
